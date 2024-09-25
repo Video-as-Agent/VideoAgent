@@ -1,18 +1,18 @@
-## AVDC
+## VideoAgent
 
-The official codebase for training video policies in AVDC
+The official codebase for training video policies in VideoAgent
 
 NEWS: We have released another repository for running our Meta-World and iTHOR experiments [here](https://github.com/flow-diffusion/AVDC_experiments/)!
 
 https://github.com/flow-diffusion/flow-diffusion.github.io/assets/43379407/9aa380df-0ff7-4c41-af2d-d67d23c53e72
 
 This repository contains the code for training video policies presented in our work   
-[Learning to Act from Actionless Videos through Dense Correspondences](https://flow-diffusion.github.io/AVDC.pdf)  
+[Self-Improving Video Generation as Agent](https://flow-diffusion.github.io/AVDC.pdf)  
 [Po-Chen Ko](https://pochen-ko.github.io/),
 [Jiayuan Mao](https://jiayuanm.com/),
 [Yilun Du](https://yilundu.github.io/),
 [Shao-Hua Sun](https://shaohua0116.github.io/),
-[Joshua B. Tenenbaum](https://cocosci.mit.edu/josh)  
+[Joshua B. Tenenbaum](https://cocosci.mit.edu/josh) 
 [website](https://flow-diffusion.github.io/) | [paper](https://flow-diffusion.github.io/AVDC.pdf) | [arXiv](https://arxiv.org/abs/2310.08576) | [experiment repo](https://github.com/flow-diffusion/AVDC_experiments/)
 
 ```bib
@@ -34,16 +34,16 @@ This repository contains the code for training video policies presented in our w
 We recommend to create a new environment with pytorch installed using conda.   
 
 ```bash  
-conda create -n avdc python=3.9
-conda activate avdc
+conda create -n videoagent python=3.9
+conda activate videoagent
 conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 ```  
 
 Next, clone the repository and install the requirements  
 
 ```bash
-git clone https://github.com/flow-diffusion/AVDC
-cd AVDC
+[git clone https://github.com/flow-diffusion/AVDC](https://github.com/TrickyJustice/VideoAgent.git)
+cd VideoAgent
 pip install -r requirements.txt
 ```
 
@@ -119,7 +119,6 @@ python train_mw.py --mode inference -c 24 -p ../examples/assembly.png -t assembl
 ## Acknowledgements
 
 This codebase is modified from the following repositories:  
-[imagen-pytorch](https://github.com/lucidrains/imagen-pytorch)  
-[guided-diffusion](https://github.com/openai/guided-diffusion)  
-# AVDC
-# AVDC
+[avdc](https://github.com/flow-diffusion/AVDC)
+# VideoAgent
+# VideoAgent
