@@ -2,7 +2,7 @@
 
 The official codebase for training video policies in VideoAgent
 
-NEWS: We have released another repository for running our Meta-World and iTHOR experiments [here](https://github.com/flow-diffusion/AVDC_experiments/)!
+NEWS: We have released another repository for running our Meta-World and iTHOR experiments [here](https://github.com/TrickyJustice/VideoAgent_exp)!
 
 This repository contains the code for training video policies presented in our work   
 [Self-Improving Video Generation as Agent](https://flow-diffusion.github.io/AVDC.pdf)  
