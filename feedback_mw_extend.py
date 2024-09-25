@@ -1,0 +1,474 @@
+from openai import OpenAI
+from PIL import Image
+import os
+import base64
+import json
+
+
+
+def encode_image(image_path):
+  with open(image_path, "rb") as image_file:
+    return base64.b64encode(image_file.read()).decode('utf-8')
+
+def encode_gif(image_path):
+    frame = Image.open(image_path)
+    nframes = 0
+    encoded = []
+    while frame:
+        image_file = os.path.basename(image_path) + "-" + ".jpg"
+        frame.convert('RGB').save(image_file)
+        with open(image_file, "rb") as image:
+            encoded.append(base64.b64encode(image.read()).decode('utf-8'))
+        nframes += 1
+        if nframes == 8: break
+        frame.seek( nframes )
+    
+    return encoded
+
+def chat_with_openai(image_paths, gif_paths, text_prompts):
+    api_key = 'sk-proj-949BygC19E83huSvkr4xT3BlbkFJwS60lvFDMhK4A2wTFeFM'
+    base64_image8 = encode_image("AVDC_gen/AVDC/examples/assembly_24_test.png")
+    base64_image8_out = encode_gif("AVDC_gen/AVDC/examples/assembly_checkpoint_276_out_3.gif")
+    #print(len(base64_image8_out))
+    base64_image7 = encode_image("AVDC_gen/AVDC/examples/assembly.png")
+    base64_image7_out = encode_gif("AVDC_gen/AVDC/examples/assembly_out_1iter_1.gif")
+    base64_image6_out = encode_gif("AVDC_gen/AVDC/examples/basketball_out_1iter_00.gif")
+    base64_image6 = base64_image6_out[0]
+    base64_image5_out = encode_gif("AVDC_gen/AVDC/examples/hammer_checkpoint_310_out_0iter_7.gif")
+    base64_image5 = base64_image5_out[0]
+    # Initialize a conversation with the system role description
+    
+    messages_c=[
+        {
+            "role": "assistant",
+            "content": [{ 
+                            "type":"text",
+                            "text": """
+                            Task Description:
+                                You are a video reviewer tasked with evaluating a series of actions depicted through eight consecutive image uploads. These images together simulate a video. This task is structured as a few-shot learning exercise, where you will first review three examples and then apply learned principles to new queries.
+
+                            Learning Phase:
+                                Example 1:
+                                    Textual Prompt: assembly.
+                                    Conditioning Image: """
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image8}"
+                                },
+                            },
+                        { 
+                            "type":"text",
+                            "text": """
+                                    GIF/Sequence of images:  """
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image8_out[0]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image8_out[1]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image8_out[2]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image8_out[3]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image8_out[4]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image8_out[5]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image8_out[6]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image8_out[7]}"
+                                },
+                            },
+                        
+                        {
+                            "type":"text", 
+                            "text": " Ideal Feedback : Task Incomplete. Move the manipulator along with the ring more forward and to the left."
+                            },
+                        { 
+                            "type":"text",
+                            "text": """
+                                Example 2:
+                                    Textual Prompt: assembly.
+                                    Conditioning Image: """
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image7}"
+                                },
+                            },
+                        { 
+                            "type":"text",
+                            "text": """
+                                    GIF/Sequence of images:  """
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image7_out[0]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image7_out[1]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image7_out[2]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image7_out[3]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image7_out[4]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image7_out[5]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image7_out[6]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image7_out[7]}"
+                                },
+                            },
+                        {
+                            "type":"text", 
+                            "text": " Ideal Feedback : Inconsistent glitch. Ring jumps without any force acting on it. Move the manipulator to the ring use it to pick ring up"
+                            },
+                        # { 
+                        #     "type":"text",
+                        #     "text": """
+                        #         Example 3:
+                        #             Textual Prompt: basketball.
+                        #             Conditioning Image: """
+                        #     },
+                        # {
+                        #     "type":"image_url", 
+                        #     "image_url":  {
+                        #         "url": f"data:image/jpeg;base64,{base64_image6}"
+                        #         },
+                        #     },
+                        # { 
+                        #     "type":"text",
+                        #     "text": """
+                        #             GIF/Sequence of images:  """
+                        #     },
+                        # {
+                        #     "type":"image_url", 
+                        #     "image_url":  {
+                        #         "url": f"data:image/jpeg;base64,{base64_image6_out[0]}"
+                        #         },
+                        #     },
+                        # {
+                        #     "type":"image_url", 
+                        #     "image_url":  {
+                        #         "url": f"data:image/jpeg;base64,{base64_image6_out[1]}"
+                        #         },
+                        #     },
+                        # {
+                        #     "type":"image_url", 
+                        #     "image_url":  {
+                        #         "url": f"data:image/jpeg;base64,{base64_image6_out[2]}"
+                        #         },
+                        #     },
+                        # {
+                        #     "type":"image_url", 
+                        #     "image_url":  {
+                        #         "url": f"data:image/jpeg;base64,{base64_image6_out[3]}"
+                        #         },
+                        #     },
+                        # {
+                        #     "type":"image_url", 
+                        #     "image_url":  {
+                        #         "url": f"data:image/jpeg;base64,{base64_image6_out[4]}"
+                        #         },
+                        #     },
+                        # {
+                        #     "type":"image_url", 
+                        #     "image_url":  {
+                        #         "url": f"data:image/jpeg;base64,{base64_image6_out[5]}"
+                        #         },
+                        #     },
+                        # {
+                        #     "type":"image_url", 
+                        #     "image_url":  {
+                        #         "url": f"data:image/jpeg;base64,{base64_image6_out[6]}"
+                        #         },
+                        #     },
+                        # {
+                        #     "type":"image_url", 
+                        #     "image_url":  {
+                        #         "url": f"data:image/jpeg;base64,{base64_image6_out[7]}"
+                        #         },
+                        #     },
+                        # {
+                        #     "type":"text", 
+                        #     "text": "Ideal Feedback : Good trajectory."
+                        #     },
+                        { 
+                            "type":"text",
+                            "text": """
+                                Example 3:
+                                    Textual Prompt:hammer.
+                                    Conditioning Image: """
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image5}"
+                                },
+                            },
+                        { 
+                            "type":"text",
+                            "text": """
+                                    GIF/Sequence of images:  """
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image5_out[0]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image5_out[1]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image5_out[2]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image5_out[3]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image5_out[4]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image5_out[5]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image5_out[6]}"
+                                },
+                            },
+                        {
+                            "type":"image_url", 
+                            "image_url":  {
+                                "url": f"data:image/jpeg;base64,{base64_image5_out[7]}"
+                                },
+                            },
+                        {
+                            "type": "text", 
+                            "text": "Ideal Feedback : The hammer must push the nail into the wood. Maintain consistency by ensuring the hammer and nail do not merge."
+                            },
+                        {
+                            "type": "text",
+                            "text": """ 
+                                    Query/Inference Phase:
+                                        Inputs Provided:
+
+                                            Textual Prompt: Describes the intended outcome or task the video aims to accomplish.
+                                            Conditioning Image: Establishes the fixed elements of the scene.
+                                            Sequence of Images (7 Frames): Illustrates consecutive moments in the video, representing the action sequence.
+
+                                        Evaluation Process:
+
+                                            Frame-by-Frame Analysis: Carefully examine each of the seven images to understand the progression and continuity of actions.
+                                            Assess Overall Coherence: Evaluate the sequence as a whole to determine if the actions transition smoothly from one frame to the next while maintaining logical progression.
+                                            Physical Accuracy Check: Ensure each frame complies with the laws of physics, identifying any discrepancies in movement or positioning.
+                                            Verify Task Completion: Confirm if the sequence as a whole accomplishes the task described in the textual prompt.
+                                            Identify Inconsistencies: Detect inconsistencies in object movement or overlaps that contradict the fixed scene elements depicted in the conditioning image.
+
+                                        Evaluation Criteria:
+
+                                            Feedback: Based on your evaluation, provide a concise, constructive sentence suggesting specific improvements. Focus on enhancing physical accuracy and task fulfillment based on identified inconsistencies or discrepancies.
+
+                                        Response Requirement:
+
+                                            Feedback must be derived from your observations during the evaluation and not exceed 20 words.
+
+                                        Additional Notes:
+
+                                            Further clarification cannot be requested.
+                                            The elements from the conditioning image must match those in each frame of the sequence."""
+                            }
+                        
+            ]
+        }
+    ]
+    responses = []
+
+    # Loop through each example provided
+    for image_path, gif_path, text_prompt in zip(image_paths, gif_paths, text_prompts):
+        # Conducting the conversation for each set of inputs
+        while True:
+            try:
+                client = OpenAI(api_key=api_key)
+                base_image = encode_image(image_path)
+                base64_image_out = encode_gif(gif_path)
+                messages_q=[
+                    
+                    #{"role": "assistant", "content": "Please upload the conditioning image."},
+                    {
+                        "role": "user", 
+                        "content": {
+                                    "type":"image_url", 
+                                    "image_url":  {
+                                        "url": f"data:image/gif;base64,{base_image}"
+                                        },
+                                    }
+                        },
+                    #{"role": "assistant", "content": "Now, upload the corresponding gif as 8 key frames."},
+                    {
+                        "role": "user", 
+                        "content": [
+                                    {
+                                        "type":"image_url", 
+                                        "image_url":  {
+                                            "url": f"data:image/jpeg;base64,{base64_image_out[0]}"
+                                            },
+                                        },
+                                    {
+                                        "type":"image_url", 
+                                        "image_url":  {
+                                            "url": f"data:image/jpeg;base64,{base64_image_out[1]}"
+                                            },
+                                        },
+                                    {
+                                        "type":"image_url", 
+                                        "image_url":  {
+                                            "url": f"data:image/jpeg;base64,{base64_image_out[2]}"
+                                            },
+                                        },
+                                    {
+                                        "type":"image_url", 
+                                        "image_url":  {
+                                            "url": f"data:image/jpeg;base64,{base64_image_out[3]}"
+                                            },
+                                        },
+                                    {
+                                        "type":"image_url", 
+                                        "image_url":  {
+                                            "url": f"data:image/jpeg;base64,{base64_image_out[4]}"
+                                            },
+                                        },
+                                    {
+                                        "type":"image_url", 
+                                        "image_url":  {
+                                            "url": f"data:image/jpeg;base64,{base64_image_out[5]}"
+                                            },
+                                        },
+                                    {
+                                        "type":"image_url", 
+                                        "image_url":  {
+                                            "url": f"data:image/jpeg;base64,{base64_image_out[6]}"
+                                            },
+                                        },
+                                    {
+                                        "type":"image_url", 
+                                        "image_url":  {
+                                            "url": f"data:image/jpeg;base64,{base64_image_out[7]}"
+                                            },
+                                        },
+                            ]
+                        },
+                        {"role": "user", "content":"the conditioning image is the first upload, the next seven uploads are the key frames of the gif and the textual prompt is:" + text_prompt + ".Return only final feedback"},
+                        #,{"role": "user", "content": "also are there any collisions?"},
+                ]
+                response = client.chat.completions.create(model="gpt-4o",messages=messages_c + messages_q)
+
+
+                # Store and print feedback
+                feedback = response.choices[0].message.content
+                responses.append(feedback)
+                print("Feedback received:", feedback)
+                break
+            except:
+                print("Bad request, retrying")
+                continue
+
+    return responses
+
+if __name__ == "__main__":
+    # Example API Key and paths
+    
+    
+    image_paths = ['AVDC_gen/AVDC/data/img_test/door-open_0.png', 'AVDC_gen/AVDC/data/img_test/door-open_1.png', 'AVDC_gen/AVDC/data/img_test/door-open_2.png', 'AVDC_gen/AVDC/data/img_test/drawer-open_0.png', 'AVDC_gen/AVDC/data/img_test/drawer-open_1.png', 'AVDC_gen/AVDC/data/img_test/drawer-open_2.png', 'AVDC_gen/AVDC/data/img_test/door-close_0.png', 'AVDC_gen/AVDC/data/img_test/door-close_1.png', 'AVDC_gen/AVDC/data/img_test/door-close_2.png', 'AVDC_gen/AVDC/data/img_test/basketball_0.png', 'AVDC_gen/AVDC/data/img_test/basketball_1.png', 'AVDC_gen/AVDC/data/img_test/basketball_2.png', 'AVDC_gen/AVDC/data/img_test/shelf-place_0.png', 'AVDC_gen/AVDC/data/img_test/shelf-place_1.png', 'AVDC_gen/AVDC/data/img_test/shelf-place_2.png', 'AVDC_gen/AVDC/data/img_test/button-press_0.png', 'AVDC_gen/AVDC/data/img_test/button-press_1.png', 'AVDC_gen/AVDC/data/img_test/button-press_2.png', 'AVDC_gen/AVDC/data/img_test/button-press-topdown_0.png', 'AVDC_gen/AVDC/data/img_test/button-press-topdown_1.png', 'AVDC_gen/AVDC/data/img_test/button-press-topdown_2.png', 'AVDC_gen/AVDC/data/img_test/faucet-close_0.png', 'AVDC_gen/AVDC/data/img_test/faucet-close_1.png', 'AVDC_gen/AVDC/data/img_test/faucet-close_2.png', 'AVDC_gen/AVDC/data/img_test/faucet-open_0.png', 'AVDC_gen/AVDC/data/img_test/faucet-open_1.png', 'AVDC_gen/AVDC/data/img_test/faucet-open_2.png', 'AVDC_gen/AVDC/data/img_test/handle-press_0.png', 'AVDC_gen/AVDC/data/img_test/handle-press_1.png', 'AVDC_gen/AVDC/data/img_test/handle-press_2.png', 'AVDC_gen/AVDC/data/img_test/hammer_0.png', 'AVDC_gen/AVDC/data/img_test/hammer_1.png', 'AVDC_gen/AVDC/data/img_test/hammer_2.png', 'AVDC_gen/AVDC/data/img_test/assembly_0.png', 'AVDC_gen/AVDC/data/img_test/assembly_1.png', 'AVDC_gen/AVDC/data/img_test/assembly_2.png']
+    gif_paths = ['AVDC_gen/AVDC/data/img_test/door-open_0_out.gif', 'AVDC_gen/AVDC/data/img_test/door-open_1_out.gif', 'AVDC_gen/AVDC/data/img_test/door-open_2_out.gif', 'AVDC_gen/AVDC/data/img_test/drawer-open_0_out.gif', 'AVDC_gen/AVDC/data/img_test/drawer-open_1_out.gif', 'AVDC_gen/AVDC/data/img_test/drawer-open_2_out.gif', 'AVDC_gen/AVDC/data/img_test/door-close_0_out.gif', 'AVDC_gen/AVDC/data/img_test/door-close_1_out.gif', 'AVDC_gen/AVDC/data/img_test/door-close_2_out.gif', 'AVDC_gen/AVDC/data/img_test/basketball_0_out.gif', 'AVDC_gen/AVDC/data/img_test/basketball_1_out.gif', 'AVDC_gen/AVDC/data/img_test/basketball_2_out.gif', 'AVDC_gen/AVDC/data/img_test/shelf-place_0_out.gif', 'AVDC_gen/AVDC/data/img_test/shelf-place_1_out.gif', 'AVDC_gen/AVDC/data/img_test/shelf-place_2_out.gif', 'AVDC_gen/AVDC/data/img_test/button-press_0_out.gif', 'AVDC_gen/AVDC/data/img_test/button-press_1_out.gif', 'AVDC_gen/AVDC/data/img_test/button-press_2_out.gif', 'AVDC_gen/AVDC/data/img_test/button-press-topdown_0_out.gif', 'AVDC_gen/AVDC/data/img_test/button-press-topdown_1_out.gif', 'AVDC_gen/AVDC/data/img_test/button-press-topdown_2_out.gif', 'AVDC_gen/AVDC/data/img_test/faucet-close_0_out.gif', 'AVDC_gen/AVDC/data/img_test/faucet-close_1_out.gif', 'AVDC_gen/AVDC/data/img_test/faucet-close_2_out.gif', 'AVDC_gen/AVDC/data/img_test/faucet-open_0_out.gif', 'AVDC_gen/AVDC/data/img_test/faucet-open_1_out.gif', 'AVDC_gen/AVDC/data/img_test/faucet-open_2_out.gif', 'AVDC_gen/AVDC/data/img_test/handle-press_0_out.gif', 'AVDC_gen/AVDC/data/img_test/handle-press_1_out.gif', 'AVDC_gen/AVDC/data/img_test/handle-press_2_out.gif', 'AVDC_gen/AVDC/data/img_test/hammer_0_out.gif', 'AVDC_gen/AVDC/data/img_test/hammer_1_out.gif', 'AVDC_gen/AVDC/data/img_test/hammer_2_out.gif', 'AVDC_gen/AVDC/data/img_test/assembly_0_out.gif', 'AVDC_gen/AVDC/data/img_test/assembly_1_out.gif', 'AVDC_gen/AVDC/data/img_test/assembly_2_out.gif']
+    text_prompts = ['door-open', 'door-open', 'door-open', 'drawer-open', 'drawer-open', 'drawer-open', 'door-close', 'door-close', 'door-close', 'basketball', 'basketball', 'basketball', 'shelf-place', 'shelf-place', 'shelf-place', 'button-press', 'button-press', 'button-press', 'button-press-topdown', 'button-press-topdown', 'button-press-topdown', 'faucet-close', 'faucet-close', 'faucet-close', 'faucet-open', 'faucet-open', 'faucet-open', 'handle-press', 'handle-press', 'handle-press', 'hammer', 'hammer', 'hammer', 'assembly', 'assembly', 'assembly']
+    
+    #image_paths = ['AVDC_gen/AVDC/data/iterative_test/assembly_24_test.png','AVDC_gen/AVDC/data/iterative_test/assembly_24_test.png','AVDC_gen/AVDC/data/iterative_test/assembly_24_test.png','AVDC_gen/AVDC/data/iterative_test/assembly_24_test.png','AVDC_gen/AVDC/data/iterative_test/assembly_24_test.png']
+    #gif_paths = ['AVDC_gen/AVDC/data/iterative_test/assembly_checkpoint_276_out_0.gif','AVDC_gen/AVDC/data/iterative_test/assembly_checkpoint_276_out_1.gif', 'AVDC_gen/AVDC/data/iterative_test/assembly_checkpoint_276_out_2.gif', 'AVDC_gen/AVDC/data/iterative_test/assembly_checkpoint_276_out_3.gif','AVDC_gen/AVDC/data/iterative_test/assembly_checkpoint_276_out_4.gif']
+    #text_prompts = ['put the ring into the stand','put the ring into the stand','put the ring into the stand','put the ring into the stand','put the ring into the stand']
+    # Call the function with example data
+    feedback_responses = chat_with_openai(image_paths, gif_paths, text_prompts)
+
+    with open("feedback_suggestive_mw.json", "w") as final:
+        json.dump(feedback_responses, final)
+
+    print("All responses:", feedback_responses)
