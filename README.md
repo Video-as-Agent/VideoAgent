@@ -92,10 +92,10 @@ We also provide checkpoints of the models described in our experiments as follow
 ### Meta-World
 [VideoAgent](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-305.pt) |  [VideoAgent-Online](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-3053083.pt) | [VideoAgent-Suggestive](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-4307.pt)   
 
-###iThor
+### iThor
 [VideoAgent](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/ithor/thor-402.pt)
 
-###Bridge
+### Bridge
 [VideoAgent](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/bridge/model-44.pt)
 
 Download and put the .pt file in `results/[environment]` folder. The resulting directory structure should be `results/{mw, thor, bridge}/model-[x].pt`, for example `results/mw/model-305.pt`
