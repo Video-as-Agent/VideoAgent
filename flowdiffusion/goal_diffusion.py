@@ -512,25 +512,14 @@ class GoalGaussianDiffusion(nn.Module):
         return posterior_mean, posterior_variance, posterior_log_variance_clipped
 
     def model_predictions(self, x, t, vid_cond, task_embed,  clip_x_start=False, rederive_pred_noise=False, guidance_weight=0):
-        # task_embed = self.text_encoder(goal).last_hidden_state
-        ##x_2 shape = 8,3,7,48,64
-        ##x_cond shape = 8, 3, 48, 64
         f = x.shape[1] // 3
-        # print("model pred. x shape", x.shape)
-        # print("model_predictions vid_cond shape", vid_cond.shape)
         x_1 = rearrange(x, 'b (f c) h w -> b c f h w', c=3)
         if vid_cond.dim() == 4:
             vid_cond = repeat(vid_cond, "b c h w -> b c f h w", f = f)
-        # else:
-        #     vid_cond = rearrange(vid_cond, 'b f c h w -> b c f h w')
-        # print("concatenated x_1", )
-        x_1 = torch.cat([x_1, vid_cond], dim=1) ##[8,6,7,128,128]
-        # print("model predictions x shape", x_1.shape)
-        # print("model predictions", x_1.shape)
+        x_1 = torch.cat([x_1, vid_cond], dim=1)
         model_out = self.model(x_1, t, task_embed)
         model_output = rearrange(model_out, 'b c f h w -> b (f c) h w')
         
-        # model_output = self.model(torch.cat([x, x_cond], dim=1), t, task_embed)
         if guidance_weight > 0.0:
             uncond_model_output = self.model(x_1, t, task_embed*0.0)
             uncond_model_output = rearrange(uncond_model_output, 'b c f h w -> b (f c) h w')
@@ -581,7 +570,6 @@ class GoalGaussianDiffusion(nn.Module):
         return ModelPrediction(pred_noise, x_start)
 
     def p_mean_variance(self, x, t, vid_cond, task_embed,  clip_denoised=False, guidance_weight=0):
-        # print("p_mean variance vid_cond shape", vid_cond.shape)
         preds = self.model_predictions(x, t, vid_cond, task_embed, guidance_weight=guidance_weight)
         x_start = preds.pred_x_start
 
@@ -595,9 +583,8 @@ class GoalGaussianDiffusion(nn.Module):
     def p_sample(self, x, t: int, vid_cond, task_embed, guidance_weight=0):
         b, *_, device = *x.shape, x.device
         batched_times = torch.full((b,), t, device = x.device, dtype = torch.long)
-        # print("p_sample vid_cond shape", vid_cond.shape)
         model_mean, _, model_log_variance, x_start = self.p_mean_variance(x, batched_times, vid_cond, task_embed, clip_denoised = True, guidance_weight=guidance_weight)
-        noise = torch.randn_like(x) if t > 0 else 0. # no noise if t == 0
+        noise = torch.randn_like(x) if t > 0 else 0.
         pred_img = model_mean + (0.5 * model_log_variance).exp() * noise
         return pred_img, x_start
 
@@ -610,8 +597,6 @@ class GoalGaussianDiffusion(nn.Module):
         x_start = None
 
         for t in tqdm(reversed(range(0, self.num_timesteps)), desc = 'sampling loop time step', total = self.num_timesteps):
-            # self_cond = x_start if self.self_condition else None
-            # print("p_sample loop vid_cond shape", vid_cond.shape)
             img, x_start = self.p_sample(img, t, vid_cond, task_embed, guidance_weight=guidance_weight)
             imgs.append(img)
 
@@ -635,8 +620,6 @@ class GoalGaussianDiffusion(nn.Module):
 
         for time, time_next in tqdm(time_pairs, desc = 'sampling loop time step'):
             time_cond = torch.full((batch,), time, device = device, dtype = torch.long)
-            # self_cond = x_start if self.self_condition else None
-            # print("ddim vid_cond shape", vid_cond.shape)
             pred_noise, x_start, *_ = self.model_predictions(img, time_cond, vid_cond, task_embed, clip_x_start = False, rederive_pred_noise = True, guidance_weight=guidance_weight)
 
             if time_next < 0:
@@ -666,7 +649,6 @@ class GoalGaussianDiffusion(nn.Module):
     @torch.no_grad()
     def sample(self, vid_cond, task_embed, batch_size = 16, return_all_timesteps = False, guidance_weight=0):
         image_size, channels = self.image_size, self.channels
-        # print("sample vid_cond shape", vid_cond.shape)
         sample_fn = self.p_sample_loop if not self.is_ddim_sampling else self.ddim_sample
         return sample_fn((batch_size, channels, image_size[0], image_size[1]), vid_cond, task_embed,  return_all_timesteps = return_all_timesteps, guidance_weight=guidance_weight)
 
@@ -707,67 +689,17 @@ class GoalGaussianDiffusion(nn.Module):
         else:
             raise ValueError(f'invalid loss type {self.loss_type}')
     
-    # @property
-    # def loss_fn(self):
-    #     if self.loss_type == 'l1':
-    #         return F.l1_loss
-    #     elif self.loss_type == 'l2':
-    #         # Define a custom function for the combined loss
-    #         def combined_loss(output, target, reduction):
-    #             mse_loss = F.mse_loss(output, target, reduction)
-    #             l1_loss = F.l1_loss(output, target,)
-    #             return mse_loss + 0.01 * l1_loss
-            
-    #         return combined_loss
-    #     else:
-    #         raise ValueError(f'Invalid loss type {self.loss_type}')
-    
-    # b, c, h, w = x_start.shape
-    #     noise = default(noise, lambda: torch.randn_like(x_start))
-
-    #     # noise sample
-
-    #     x = self.q_sample(x_start=x_start, t=t, noise=noise)
-
-    #     # predict and take gradient step
-
-    #     model_out = self.model(torch.cat([x, x_cond], dim=1), t, task_embed)
-
-    #     if self.objective == 'pred_noise':
-    #         target = noise
-    #     elif self.objective == 'pred_x0':
-    #         target = x_start
-    #     elif self.objective == 'pred_v':
-    #         v = self.predict_v(x_start, t, noise)
-    #         target = v
-    #     else:
-    #         raise ValueError(f'unknown objective {self.objective}')
-
-    #     loss = self.loss_fn(model_out, target, reduction = 'none')
-    #     loss = reduce(loss, 'b ... -> b (...)', 'mean')
-
-    #     loss = loss * extract(self.loss_weight, t, loss.shape)
-    #     return loss.mean()
-
-
     def p_losses(self, x_start, t, x_cond, vid_cond, task_embed, noise=None): ##frame conditioning
         
         b, c, h, w = x_start.shape
-        # print("x start shape", x_start.shape)
-        # print("vid cond shape", vid_cond.shape)
         noise = default(noise, lambda: torch.randn_like(x_start))
         x = self.q_sample(x_start=x_start, t=t, noise=noise)
         f = x.shape[1] // 3
-        # x_new = x[:,3:,:,:]
         x = rearrange(x, 'b (f c) h w -> b c f h w', c=3)
-        # print("p_losses_x_cond shape", x_cond.shape)
-        # x_cond = repeat(x_cond, 'b c h w -> b c f h w', f = 6)
-        # print("x:",x.shape)
-        # print("v",vid_cond.shape)
         if vid_cond.shape[1] == f:
-            vid_cond = rearrange(vid_cond, 'b f c h w -> b c f h w') ##comment for ithor training
-        x = torch.cat([vid_cond, x], dim=1) ##[32,6,7,48,64]
-        # x = torch.cat([x, x_cond], dim=1)
+            vid_cond = rearrange(vid_cond, 'b f c h w -> b c f h w')
+        x = torch.cat([vid_cond, x], dim=1)
+        
         model_out = self.model(x, t, task_embed)
         model_out = rearrange(model_out, 'b c f h w -> b (f c) h w')
         
@@ -786,27 +718,22 @@ class GoalGaussianDiffusion(nn.Module):
 
         loss = loss * extract(self.loss_weight, t, loss.shape)
         
-        # Calculate L2 regularization
         l2_reg = torch.tensor(0., device=model_out.device)
         for param in self.model.parameters():
             l2_reg += torch.norm(param, p=2)
 
-        # Combine main loss and regularization
-        lambda_reg = 1e-2  # Regularization strength, adjust as needed
+        lambda_reg = 1e-2
         total_loss = loss.mean() + lambda_reg * l2_reg
 
         return total_loss
 
-    def forward(self, img, img_cond, vid_cond, task_embed): ##frame conditioning
-    # def forward(self, img, img_cond, task_embed):
+    def forward(self, img, img_cond, vid_cond, task_embed):
         b, c, h, w, device, img_size, = *img.shape, img.device, self.image_size
         assert h == img_size[0] and w == img_size[1], f'height and width of image must be {img_size}, got({h}, {w})'
         t = torch.randint(0, self.num_timesteps, (b,), device=device).long()
-        # t = sample_timesteps(b=b, num_timesteps=self.num_timesteps, device=device)
 
         img = self.normalize(img)
-        # return self.p_losses(img, t, img_cond, task_embed)
-        return self.p_losses(img, t, img_cond, vid_cond, task_embed) ##frame conditioning
+        return self.p_losses(img, t, img_cond, vid_cond, task_embed)
 
 # trainer class
 
@@ -839,12 +766,11 @@ class Trainer(object):
         calculate_fid = True,
         inception_block_idx = 2048, 
         cond_drop_chance=0.1,
-        wandb_project="Flow Diffusion",
-        wandb_entity="trickyjustice"
+        wandb_project=None,
+        wandb_entity=None
     ):
         super().__init__()
         
-        # wandb.init(project=wandb_project, entity=wandb_entity)
 
         self.cond_drop_chance = cond_drop_chance
         self.wandb_project = wandb_project
@@ -854,15 +780,13 @@ class Trainer(object):
 
         # accelerator
         init_handler = InitProcessGroupKwargs()
-        init_handler.timeout = datetime.timedelta(seconds=5400)  # change timeout to avoid a strange NCCL bug
+        init_handler.timeout = datetime.timedelta(seconds=5400)
         
         from accelerate import DistributedDataParallelKwargs
-        # init_train = DistributedDataParallelKwargs(find_unused_parameters=True)
         init_train = 'DDP'
         fsdp_plugin = None
         
         self.accelerator = Accelerator(
-            # split_batches = split_batches,
             fsdp_plugin=fsdp_plugin,
             even_batches=False,
             kwargs_handlers=[init_handler],
@@ -878,7 +802,6 @@ class Trainer(object):
         self.channels = channels
         self.update_epoch = 10
 
-        # InceptionV3 for fid-score computation
 
         self.inception_v3 = None
 
@@ -888,9 +811,6 @@ class Trainer(object):
             self.inception_v3 = InceptionV3([block_idx])
             self.inception_v3.to(self.device)
 
-        # sampling and training hyperparameters
-
-        # assert has_int_squareroot(num_samples), 'number of samples must have an integer square root'
         self.num_samples = num_samples
         self.save_and_sample_every = save_and_sample_every
 
@@ -910,8 +830,7 @@ class Trainer(object):
         self.valid_ds = valid_set
         dl = DataLoader(self.ds, batch_size=train_batch_size, shuffle = True, num_workers=0)
         dl = self.accelerator.prepare(dl)
-        self.dl = cycle(dl)# dl = dataloader
-        # self.dl = cycle(dl)
+        self.dl = cycle(dl)
         self.valid_dl = DataLoader(self.valid_ds, batch_size = valid_batch_size, shuffle = False, num_workers = 0)
 
 
@@ -921,10 +840,8 @@ class Trainer(object):
 
         # for logging results in a folder periodically
 
-        # if self.accelerator.is_main_process:
         self.ema = EMA(diffusion_model, beta = ema_decay, update_every = ema_update_every)
         self.ema.to(self.accelerator.device)
-        # self.accelerator.broadcast(self.ema.state_dict(), from_process=0)
 
         self.results_folder = Path(results_folder)
         self.results_folder.mkdir(exist_ok = True, parents = True)
@@ -933,16 +850,9 @@ class Trainer(object):
 
         self.step = 0
 
-        # prepare model, dataloader, optimizer with accelerator
-
         self.model, self.opt, self.text_encoder = \
             self.accelerator.prepare(self.model, self.opt, self.text_encoder)
             
-        # #image and video paths for feedback
-        # self.image_paths = {}
-        # self.video_paths = {}
-        # self.video_dir = "/home/a2soni/AVDC/binary/videos"
-        # self.image_dir = "/home/a2soni/AVDC/binary/images"
 
     @property
     def device(self):
@@ -952,7 +862,7 @@ class Trainer(object):
         if not self.accelerator.is_local_main_process:
             return
 
-        model_path = self.results_folder / f'iteration_1-{milestone}_binary.pt'  # Define the path
+        model_path = self.results_folder / f'model-{milestone}.pt'  # Define the path
         data = {
             'step': self.step,
             'model': self.accelerator.get_state_dict(self.model),
@@ -962,14 +872,13 @@ class Trainer(object):
             'version': __version__
         }
 
-        torch.save(data, str(model_path))  # Use the defined path
-        # wandb.save(str(model_path))  # Correctly reference the path here
+        torch.save(data, str(model_path))
 
     def load(self, milestone):
         accelerator = self.accelerator
         device = self.accelerator.device
 
-        data = torch.load(str(self.results_folder / f'iteration_1-{milestone}.pt'), map_location=device)
+        data = torch.load(str(self.results_folder / f'model-{milestone}.pt'), map_location=device)
 
         model = self.accelerator.unwrap_model(self.model)
         model.load_state_dict(data['model'])
@@ -984,8 +893,6 @@ class Trainer(object):
 
         if exists(self.accelerator.scaler) and exists(data['scaler']):
             self.accelerator.scaler.load_state_dict(data['scaler'])
-
-    #     return fid_value
     def encode_batch_text(self, batch_text):
         batch_text_ids = self.tokenizer(batch_text, return_tensors = 'pt', padding = True, truncation = True, max_length = 128).to(self.device)
         batch_text_embed = self.text_encoder(**batch_text_ids).last_hidden_state
@@ -994,7 +901,6 @@ class Trainer(object):
     def sample(self, vid_cond, batch_text, batch_size=1, guidance_weight=0):
         if not hasattr(self, 'ema') or self.ema is None:
             raise AttributeError("EMA model has not been initialized.")
-        print(vid_cond.shape)
         device = self.accelerator.device
         task_embeds = self.encode_batch_text(batch_text)
         return self.ema.ema_model.sample(vid_cond.to(device), task_embeds.to(device), batch_size=batch_size, guidance_weight=guidance_weight)
@@ -1008,20 +914,10 @@ class Trainer(object):
         else:
             wandb.init(project=self.wandb_project, entity = self.wandb_entity, mode="disabled")
             
-            # Calculate steps_per_epoch right after you initialize your DataLoader and other parameters
-        total_sequences = len(self.ds)  # assuming self.ds is your dataset
-        batch_size = self.batch_size  # assuming self.dl is your DataLoader
-        steps_per_epoch = (total_sequences // batch_size) + 1  # integer division ceiling
+        total_sequences = len(self.ds)
+        batch_size = self.batch_size
+        steps_per_epoch = (total_sequences // batch_size) + 1 
         save_steps = steps_per_epoch*self.update_epoch
-        
-        update_buffer = {}  # Buffer to store changes to x_2
-        self.image_paths = [None] * total_sequences  # Initialize image paths list
-        self.video_paths = [None] * total_sequences  # Initialize video paths list
-        self.task_descriptions = [None] * total_sequences  # Initialize task descriptions list
-        self.update_task_buffer = {}
-        self.data_point_counter = 0
-        self.initial_step = self.step
-        # print(self.initial_step)
 
 
         with tqdm(initial = self.step, total = self.train_num_steps, disable = not accelerator.is_main_process) as pbar:
@@ -1031,82 +927,19 @@ class Trainer(object):
                 total_loss = 0.
 
                 for _ in range(self.gradient_accumulate_every):
-                    idx, x, x_cond, goal, x_2 = next(self.dl) ##frame conditioning
-                    # print("x shape", x.shape)
-                    # if x.shape[2] != 7:
-                        # continue
-                    # print("x_cond shape", x_cond.shape)
+                    idx, x, x_cond, goal, x_2 = next(self.dl)
                     if x.dim() == 5:
                         x = rearrange(x, 'b c f h w -> b (f c) h w')
-                    # print("vid cond shape", x_2.shape)
-                    x, x_cond, x_2 = x.to(device), x_cond.to(device), x_2.to(device) ##frame conditioning
-                    # print("mounted to device")
+                    x, x_cond, x_2 = x.to(device), x_cond.to(device), x_2.to(device)
                     goal_embed = self.encode_batch_text(goal)
                     goal_embed = goal_embed * (torch.rand(goal_embed.shape[0], 1, 1, device = goal_embed.device) > self.cond_drop_chance).float()
 
 
                     with self.accelerator.autocast():
-                        # print("HERE")
-                        loss = self.model(x, x_cond, x_2, goal_embed) ##frame condidioning
+                        loss = self.model(x, x_cond, x_2, goal_embed)
                         loss = loss / self.gradient_accumulate_every
                         total_loss += loss.item()
                         
-                        # with torch.no_grad():
-                        # if accelerator.is_main_process:
-                        #     generated_video = self.ema.ema_model.sample(batch_size=batch_size, vid_cond=x_2, task_embed=goal_embed)
-                        #     for i in range(len(x)):
-                        #             # Store generated video in buffer with (idx, start_idx) as key
-                        #         update_buffer[(idx[i], start_idx[i])] = generated_video[i]
-
-                        #     # Save x_cond and new_x_2 to cache directory
-                        #     img_path = f'/home/achint/AVDC_2/cache/img_{idx[i]}_{start_idx[i]}.png'
-                        #     vid_path = f'/home/achint/AVDC_2/cache/vid_{idx[i]}_{start_idx[i]}.gif'
-                        #     # torch.save(x_cond[i], img_path)
-                        #     # torch.save(generated_video, vid_path)
-                        #     # video_tensor = generated_video.cpu().numpy().astype(np.uint8)  # Convert to numpy array and uint8
-                        #     output_1 = rearrange(generated_video, '(f c) h w -> f c h w', c = 3)
-                        #     # print(output_1.shape)
-                        #     output_1 = torch.cat([img_cond.unsqueeze(0), output_1], dim=0).detach()
-                        #     # print("output_1 shape", output_1.shape)
-                        #     output_1 = (output_1.cpu().numpy().transpose(0, 2, 3, 1).clip(0, 1) * 255).astype('uint8')
-                        #     # print("video shape", output_1.shape)
-                        #     imageio.mimsave(vid_path, output_1, duration=200, loop=1000)
-                        #     # imageio.mimsave(vid_path, video_tensor, fps=25)
-                            
-                        #     # image_path = os.path.join(self.image_dir, f'image_{key}.png')
-                        #     imageio.imwrite(img_path, (x_cond[i].permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8)) 
-                            
-                        #     self.image_paths[idx[i]] = img_path
-                        #     self.video_paths[idx[i]] = vid_path
-                        #     self.task_descriptions[idx[i]] = goal[i]
-                        #     self.update_task_buffer[(idx[i], start_idx[i])] = goal[i]
-                
-                        # feedback_responses = chat_with_openai_rf(self.image_paths, self.video_paths, self.task_descriptions)
-                        # print(feedback_responses)
-                        
-                        # # Update task descriptions with feedback
-                        # for i, feedback in enumerate(feedback_responses):
-                        #     if feedback is not None:
-                        #         self.update_task_buffer[(idx[i], start_idx[i])] += ', feedback is ' + feedback
-                    
-                        # Process the update buffer to apply changes to dataset
-                        # for (sequence_idx, frame_start_idx), new_x_2 in update_buffer.items():
-                        #     sequence_idx = sequence_idx.item() if torch.is_tensor(sequence_idx) else sequence_idx
-                        #     frame_start_idx = frame_start_idx.item() if torch.is_tensor(frame_start_idx) else frame_start_idx
-
-                        #     self.ds.update_x_2(sequence_idx, frame_start_idx, new_x_2)
-                            
-                        # # Clear buffers and paths
-                        # update_buffer.clear()
-                        # update_task_buffer.clear()
-                        # self.clear_paths(self.image_paths)
-                        # self.clear_paths(self.video_paths)
-
-                        # # Reset lists
-                        # self.image_paths = [None] * total_sequences
-                        # self.video_paths = [None] * total_sequences
-                        # self.task_descriptions = [None] * total_sequences
-                
                         self.accelerator.backward(loss)
 
                 accelerator.clip_grad_norm_(self.model.parameters(), 1.0)
@@ -1129,48 +962,8 @@ class Trainer(object):
                         with torch.no_grad():
                             milestone = self.step // self.save_and_sample_every
                             batches = num_to_groups(self.num_samples, self.valid_batch_size)
-                            ### get val_imgs from self.valid_dl
-                            # x_2s = []
-                            # xs = []
-                            # x_conds = []
-                            # task_embeds = []
-                            # for i, (idx, x,label, x_2) in enumerate(self.valid_dl):
-                            #     xs.append(x)
-                            #     # x_conds.append(x_cond.to(device))
-                            #     x_2s.append(x_2.to(device))
-                            #     task_embeds.append(self.encode_batch_text(label))
                             
-                            # with self.accelerator.autocast():
-                            #     all_xs_list = list(map(lambda n, c, e: self.ema.ema_model.sample(batch_size=n, vid_cond=c, task_embed=e), batches, x_2s, task_embeds))
-                        
                         print_gpu_utilization()
-                        
-                        # gt_xs = torch.cat(xs, dim = 0).detach().cpu() # [batch_size, 3*n, 120, 160]
-                        # # make it [batchsize*n, 3, 120, 160]
-                        # n_rows = gt_xs.shape[1]
-                        # # gt_xs = rearrange(gt_xs, 'b (n c) h w -> b n c h w', n=n_rows)
-                        # ### save images
-                        # # x_conds = torch.cat(x_conds, dim = 0).detach().cpu()
-                        # # x_conds = rearrange(x_conds, 'b (n c) h w -> b n c h w', n=1)
-                        # all_xs = torch.cat(all_xs_list, dim = 0).detach().cpu()
-                        # all_xs = rearrange(all_xs, 'b (n c) h w -> b n c h w', n=n_rows)
-
-                        # gt_first = gt_xs[:, :1]
-                        # gt_last = gt_xs[:, -1:]
-
-
-
-                        # if self.step == self.save_and_sample_every:
-                        #     os.makedirs(str(self.results_folder / f'imgs'), exist_ok = True)
-                        #     gt_img = torch.cat([gt_first, gt_last, gt_xs], dim=1)
-                        #     gt_img = rearrange(gt_img, 'b n c h w -> (b n) c h w', n=n_rows+2)
-                        #     utils.save_image(gt_img, str(self.results_folder / f'imgs/gt_img.png'), nrow=n_rows+2)
-
-                        # os.makedirs(str(self.results_folder / f'imgs/outputs'), exist_ok = True)
-                        # pred_img = torch.cat([gt_first, gt_last,  all_xs], dim=1)
-                        # pred_img = rearrange(pred_img, 'b n c h w -> (b n) c h w', n=n_rows+2)
-                        # utils.save_image(pred_img, str(self.results_folder / f'imgs/outputs/sample-{milestone}.png'), nrow=n_rows+2)
-
                         self.save(milestone)
 
                 pbar.update(1)
