@@ -94,7 +94,7 @@ python train_mw.py --mode inference -c 1 -p ../examples/assembly.png -t assembly
 ## Pretrained models 
 
 We also provide checkpoints of the models described in our experiments as following.   
-# Meta-World
+### Meta-World
 [VideoAgent](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-305.pt) |  [VideoAgent-Online](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-3053083.pt) | [VideoAgent-Suggestive](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-4307.pt)   
 
 Download and put the .pt file in `results/[environment]` folder. The resulting directory structure should be `results/{mw, thor, bridge}/model-[x].pt`, for example `results/mw/model-24.pt`
