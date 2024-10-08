@@ -2,16 +2,18 @@
 
 The official codebase for training video policies in VideoAgent
 
-NEWS: We have released another repository for running our Meta-World and iTHOR experiments [here](https://github.com/TrickyJustice/VideoAgent_exp)!
+NEWS: We have released another repository for running our Meta-World and iTHOR experiments [here](https://github.com/Video-as-Agent/VideoAgent_exp)!
 
 This repository contains the code for training video policies presented in our work   
-[Self-Improving Video Generation as Agent](https://flow-diffusion.github.io/AVDC.pdf)  
-[Po-Chen Ko](https://pochen-ko.github.io/),
-[Jiayuan Mao](https://jiayuanm.com/),
-[Yilun Du](https://yilundu.github.io/),
-[Shao-Hua Sun](https://shaohua0116.github.io/),
-[Joshua B. Tenenbaum](https://cocosci.mit.edu/josh) 
-[website](https://flow-diffusion.github.io/) | [paper](https://flow-diffusion.github.io/AVDC.pdf) | [arXiv](https://arxiv.org/abs/2310.08576) | [experiment repo](https://github.com/TrickyJustice/VideoAgent_exp)
+[VideoAgent: Self improving video generation](https://flow-diffusion.github.io/AVDC.pdf)  
+[Achint Soni](https://trickyjustice.github.io),
+[Sreyas Venkataraman](https://github.com/vsreyas),
+[Abhranil Chandra](https://abhranilchandra.github.io),
+[Sebastian Fischmeister](https://uwaterloo.ca/embedded-software-group/profiles/sebastian-fischmeister),
+[Percy Liang](https://cs.stanford.edu/~pliang/) 
+[Bo Dai](https://bo-dai.github.io)
+[Sherry Yang](https://sherryy.github.io)
+[website](https://flow-diffusion.github.io/) | [paper](https://flow-diffusion.github.io/AVDC.pdf) | [arXiv](https://arxiv.org/abs/2310.08576) | [experiment repo](https://github.com/Video-as-Agent/VideoAgent_exp)
 
 ```bib
 @article{Ko2023Learning,
@@ -21,11 +23,6 @@ This repository contains the code for training video policies presented in our w
   year={2023},
 }
 ```
-
-## Updates  
- - 2023/10/21: Support custom task name and any number of videos (Removed task/# of vid constraints leftover from our experiments) 
- - 2024/01/02: Released another repository for Meta-World and iTHOR experiments [here](https://github.com/flow-diffusion/AVDC_experiments/).
- - 2024/01/03: Updated argumants for DDIM sampling and Classifier-Free Guidance. 
 
 ## Getting started  
 
@@ -40,15 +37,13 @@ conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvi
 Next, clone the repository and install the requirements  
 
 ```bash
-[git clone https://github.com/flow-diffusion/AVDC](https://github.com/TrickyJustice/VideoAgent.git)
+[git clone https://github.com/Video-as-Agent/VideoAgent](https://github.com/Video-as-Agent/VideoAgent)
 cd VideoAgent
 pip install -r requirements.txt
 ```
 
 
 ## Dataset structure
-
-This repo contains example dataset structure in `datasets/`.   
 
 The pytorch dataset classes are defined in `flowdiffusion/datasets.py`
 
@@ -97,7 +92,13 @@ We also provide checkpoints of the models described in our experiments as follow
 ### Meta-World
 [VideoAgent](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-305.pt) |  [VideoAgent-Online](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-3053083.pt) | [VideoAgent-Suggestive](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-4307.pt)   
 
-Download and put the .pt file in `results/[environment]` folder. The resulting directory structure should be `results/{mw, thor, bridge}/model-[x].pt`, for example `results/mw/model-24.pt`
+###iThor
+[VideoAgent](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/ithor/thor-402.pt)
+
+###Bridge
+[VideoAgent](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/bridge/model-44.pt)
+
+Download and put the .pt file in `results/[environment]` folder. The resulting directory structure should be `results/{mw, thor, bridge}/model-[x].pt`, for example `results/mw/model-305.pt`
 
 Or use `download.sh`
 ```bash
@@ -108,11 +109,11 @@ Or use `download.sh`
 
 After this, you can use argument `-c [x]` to resume training or inference with our checkpoint. For example:  
 ```bash
-python train_mw.py --mode train -c 24
+python train_mw.py --mode train -c 305
 ```
 Or  
 ```bash
-python train_mw.py --mode inference -c 24 -p ../examples/assembly.png -t assembly
+python train_mw.py --mode inference -c 305 -p ../examples/assembly.png -t assembly
 ```
 
 ## Acknowledgements
