@@ -16,7 +16,7 @@ def main(args):
     else:
         train_set = SequentialNavDataset(
             sample_per_seq=sample_per_seq, 
-            path="/home/ubuntu/sreyas/Sreyas/thor_data", 
+            path="../datasets/thor", 
             target_size=target_size,
         )
         valid_inds = [i for i in range(0, len(train_set), len(train_set)//valid_n)][:valid_n]
@@ -47,16 +47,16 @@ def main(args):
         text_encoder=text_encoder,
         train_set=train_set,
         valid_set=valid_set,
-        train_lr=1e-8,
-        train_num_steps =160000,
-        save_and_sample_every =100,
+        train_lr=1e-4,
+        train_num_steps =90000,
+        save_and_sample_every = 200,
         ema_update_every = 10,
         ema_decay = 0.999,
-        train_batch_size =1,
-        valid_batch_size =1,
-        gradient_accumulate_every = 6,
+        train_batch_size =4,
+        valid_batch_size =4,
+        gradient_accumulate_every = 2,
         num_samples=valid_n, 
-        results_folder ='/home/ubuntu/achint/models/thor_video_cond',
+        results_folder ='../results/thor',
         fp16 =True,
         amp=True,
     )
