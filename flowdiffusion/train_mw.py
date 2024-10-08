@@ -16,7 +16,7 @@ def main(args):
     else:
         train_set = SequentialDatasetv2(
             sample_per_seq=sample_per_seq, 
-            path="/home/ubuntu/achint/datasets/metaworld_split/metaworld_dataset", 
+            path="../datasets/metaworld", 
             target_size=target_size,
             randomcrop=True
         )
@@ -49,7 +49,7 @@ def main(args):
         text_encoder=text_encoder,
         train_set=train_set,
         valid_set=valid_set,
-        train_lr=1e-5, #decrease
+        train_lr=1e-4,
         train_num_steps =65001,
         save_and_sample_every = 200,#200
         ema_update_every = 10,
@@ -58,7 +58,7 @@ def main(args):
         valid_batch_size =4,
         gradient_accumulate_every = 1,
         num_samples=valid_n, 
-        results_folder ='/home/ubuntu/achint/models/mw_long_feedback',
+        results_folder ='../results/mw',
         fp16 =True,
         amp=True,
     )
@@ -78,7 +78,6 @@ def main(args):
         guidance_weight = args.guidance_weight
         image = Image.open(args.inference_path)
         batch_size = 1
-        ### 231130 fixed center crop issue 
         transform = transforms.Compose([
             transforms.Resize((240, 320)),
             transforms.CenterCrop(target_size),
