@@ -10,8 +10,8 @@ This repository contains the code for training video policies presented in our w
 [Sreyas Venkataraman](https://github.com/vsreyas),
 [Abhranil Chandra](https://abhranilchandra.github.io),
 [Sebastian Fischmeister](https://uwaterloo.ca/embedded-software-group/profiles/sebastian-fischmeister),
-[Percy Liang](https://cs.stanford.edu/~pliang/) 
-[Bo Dai](https://bo-dai.github.io)
+[Percy Liang](https://cs.stanford.edu/~pliang/),
+[Bo Dai](https://bo-dai.github.io),
 [Sherry Yang](https://sherryy.github.io)
 [website](https://flow-diffusion.github.io/) | [paper](https://flow-diffusion.github.io/AVDC.pdf) | [arXiv](https://arxiv.org/abs/2310.08576) | [experiment repo](https://github.com/Video-as-Agent/VideoAgent_exp)
 
