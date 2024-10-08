@@ -1,8 +1,0 @@
-flowdiffusion/__pycache__/
-flowdiffusion/feedback_fewshot/
-flowdiffusion/wandb/
-examples/
-binary/
-cache/
-flowdiffusion/guided_diffusion/guided_diffusion/__pycache__/
-flowdiffusion/model/__pycache__/
