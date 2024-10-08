@@ -10,7 +10,7 @@ import json
 from PIL import Image
 import tqdm
 from accelerate import Accelerator
-from datasets import SequentialDatasetNp, SequentialDatasetVal
+from datasets import SequentialDataset, SequentialDatasetVal
 import argparse
 
 
@@ -22,11 +22,11 @@ def main(args):
     if args.mode == 'inference':
         train_set = valid_set = [None] # dummy
     else:
-        train_set = SequentialDatasetNp(
+        train_set = SequentialDataset(
             sample_per_seq=sample_per_seq, 
-            path="../datasets/bridge/numpy/bridge_data_v1/berkeley/", 
-            target_size=target_size,
-            debug=False,
+            path="../datasets/bridge", 
+            target_size=target_size
+            # debug=False,
         )
         valid_inds = [i for i in range(0, len(train_set), len(train_set)//valid_n)][:valid_n]
         valid_set = Subset(train_set, valid_inds)
@@ -44,7 +44,7 @@ def main(args):
         image_size=target_size,
         timesteps=100,
         sampling_timesteps=args.sample_steps,
-        loss_type='l2',
+        loss_type='l1',
         objective='pred_v',
         beta_schedule = 'cosine',
         min_snr_loss_weight = True,
@@ -57,11 +57,11 @@ def main(args):
         train_set=train_set,
         valid_set=valid_set,
         train_lr=1e-4,
-        train_num_steps =180000,
-        save_and_sample_every =4000,
+        train_num_steps =240000,
+        save_and_sample_every =100,
         ema_update_every = 10,
         ema_decay = 0.999,
-        train_batch_size =32,
+        train_batch_size =16,
         valid_batch_size =valid_n,
         gradient_accumulate_every = 1,
         num_samples=30, 
@@ -109,6 +109,7 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--inference_path', type=str, default=None) # path to input image
     parser.add_argument('-t', '--text', type=str, default=None) # task text 
     parser.add_argument('-g', '--guidance_weight', type=int, default=0) # set to positive to use guidance
+    parser.add_argument('-s', '--sample_steps', type=int, default=50) # set to positive to use guidance
     args = parser.parse_args()
     if args.mode == 'inference':
         assert args.checkpoint_num is not None
