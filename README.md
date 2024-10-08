@@ -120,5 +120,3 @@ python train_mw.py --mode inference -c 305 -p ../examples/assembly.png -t assemb
 
 This codebase is modified from the following repositories:  
 [avdc](https://github.com/flow-diffusion/AVDC)
-# VideoAgent
-# VideoAgent
