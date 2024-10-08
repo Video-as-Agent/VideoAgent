@@ -94,7 +94,7 @@ python train_mw.py --mode inference -c 1 -p ../examples/assembly.png -t assembly
 ## Pretrained models 
 
 We also provide checkpoints of the models described in our experiments as following.   
-[Meta-World](https://huggingface.co/Po-Chen/flowdiffusion/resolve/main/ckpts/metaworld/model-24.pt) |  [iTHOR](https://huggingface.co/Po-Chen/flowdiffusion/resolve/main/ckpts/ithor/model-30.pt) | [Bridge](https://huggingface.co/Po-Chen/flowdiffusion/resolve/main/ckpts/bridge/model-42.pt)   
+[Meta-World](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-305.pt) |  [iTHOR](https://huggingface.co/Po-Chen/flowdiffusion/resolve/main/ckpts/ithor/model-30.pt) | [Bridge](https://huggingface.co/Po-Chen/flowdiffusion/resolve/main/ckpts/bridge/model-42.pt)   
 
 Download and put the .pt file in `results/[environment]` folder. The resulting directory structure should be `results/{mw, thor, bridge}/model-[x].pt`, for example `results/mw/model-24.pt`
 
