@@ -37,7 +37,7 @@ conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvi
 Next, clone the repository and install the requirements  
 
 ```bash
-[git clone https://github.com/Video-as-Agent/VideoAgent](https://github.com/Video-as-Agent/VideoAgent)
+git clone https://github.com/Video-as-Agent/VideoAgent
 cd VideoAgent
 pip install -r requirements.txt
 ```
