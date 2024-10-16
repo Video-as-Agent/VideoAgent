@@ -5,7 +5,7 @@ The official codebase for training video policies in VideoAgent
 NEWS: We have released another repository for running our Meta-World and iTHOR experiments [here](https://github.com/Video-as-Agent/VideoAgent_exp)!
 
 This repository contains the code for training video policies presented in our work   
-[VideoAgent: Self improving video generation](https://flow-diffusion.github.io/AVDC.pdf)  
+[VideoAgent: Self improving video generation](https://arxiv.org/pdf/2410.10076)  
 [Achint Soni](https://trickyjustice.github.io),
 [Sreyas Venkataraman](https://github.com/vsreyas),
 [Abhranil Chandra](https://abhranilchandra.github.io),
