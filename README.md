@@ -16,11 +16,14 @@ This repository contains the code for training video policies presented in our w
 [website](https://flow-diffusion.github.io/) | [paper](https://flow-diffusion.github.io/AVDC.pdf) | [arXiv](https://arxiv.org/abs/2310.08576) | [experiment repo](https://github.com/Video-as-Agent/VideoAgent_exp)
 
 ```bib
-@article{Ko2023Learning,
-  title={{Learning to Act from Actionless Videos through Dense Correspondences}},
-  author={Ko, Po-Chen and Mao, Jiayuan and Du, Yilun and Sun, Shao-Hua and Tenenbaum, Joshua B},
-  journal={arXiv:2310.08576},
-  year={2023},
+@misc{soni2024videoagentselfimprovingvideogeneration,
+      title={VideoAgent: Self-Improving Video Generation}, 
+      author={Achint Soni and Sreyas Venkataraman and Abhranil Chandra and Sebastian Fischmeister and Percy Liang and Bo Dai and Sherry Yang},
+      year={2024},
+      eprint={2410.10076},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2410.10076}, 
 }
 ```
 
