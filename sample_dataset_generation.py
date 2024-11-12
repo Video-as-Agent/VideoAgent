@@ -7,12 +7,14 @@ def adaptive_sampling(seq, start_frame_idx, last_frame_idx, total_frames, sample
     initial_dense_factor = 0.9 
     decrease_factor = 0.2 
     
+    total_interval = last_frame_idx - start_frame_idx
+
     for i in range(sample_per_seq - 1):
         if i < sample_per_seq // 2:
-            interval = max(1, int(initial_dense_factor * (total_frames - start_frame_idx) / sample_per_seq))
+            interval = max(1, int(initial_dense_factor * (total_interval) / sample_per_seq))
         else:
             initial_dense_factor += decrease_factor
-            interval = max(1, int(initial_dense_factor * (total_frames - start_frame_idx) / sample_per_seq))
+            interval = max(1, int(initial_dense_factor * (total_interval) / sample_per_seq))
 
         adaptive_intervals.append(interval)
     
@@ -20,7 +22,7 @@ def adaptive_sampling(seq, start_frame_idx, last_frame_idx, total_frames, sample
     current_index = start_frame_idx
     for interval in adaptive_intervals:
         current_index += interval
-        if current_index < total_frames:
+        if current_index <= last_frame_idx:
             samples.append(seq[current_index])
         else:
             break  
@@ -28,6 +30,7 @@ def adaptive_sampling(seq, start_frame_idx, last_frame_idx, total_frames, sample
     samples.insert(0, seq[start_frame_idx])    
     
     return samples
+
 
 def process_dataset(input_base_path, output_base_path):
     environments = os.listdir(input_base_path)
@@ -49,7 +52,7 @@ def process_dataset(input_base_path, output_base_path):
                 total_frames = len(images)
                 trajectory_count = 0
 
-                for i in range(0, total_frames - 10, 3):
+                for i in range(0, total_frames - 12, 3):
                     group = images[i:i+3]
                     if len(group) < 1:
                         continue
@@ -69,6 +72,6 @@ def process_dataset(input_base_path, output_base_path):
                         dst = os.path.join(trajectory_dir, img)
                         shutil.copy(src, dst)
 
-input_base_path = '/dataset/metaworld_data'
-output_base_path = '/dataset/metaworld_dataset'
+input_base_path = '/dataset/metaworld'
+output_base_path = '/dataset/split_metaworld_dataset'
 process_dataset(input_base_path, output_base_path)
