@@ -48,7 +48,7 @@ def process_dataset(input_base_path, output_base_path):
                 seed_path = os.path.join(position_path, seed)
                 output_seed_path = os.path.join(output_position_path, seed)
                 os.makedirs(output_seed_path, exist_ok=True)
-                images = sorted([img for img in os.listdir(seed_path) if img.endswith('.png')])
+                images = sorted([img for img in os.listdir(seed_path) if img.endswith('.png')], key=lambda x: int(x.split('.')[0]))
                 total_frames = len(images)
                 trajectory_count = 0
 
