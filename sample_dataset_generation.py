@@ -2,7 +2,7 @@ import os
 import random
 import shutil
 
-def adaptive_sampling(seq, start_frame_idx, last_frame_idx, total_frames, sample_per_seq=7):
+def adaptive_sampling(seq, start_frame_idx, last_frame_idx, total_frames, sample_per_seq=8):
     adaptive_intervals = []
     initial_dense_factor = 0.9 
     decrease_factor = 0.2 
