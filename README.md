@@ -2,7 +2,7 @@
 
 The official codebase for training video policies in VideoAgent
 
-NEWS: We have released another repository for running our Meta-World and iTHOR experiments [here](https://github.com/Video-as-Agent/VideoAgent_exp)!
+NEWS: We have released new set of checkpoints for MetaWorld with better performance.
 
 This repository contains the code for training video policies presented in our work   
 [VideoAgent: Self improving video generation](https://arxiv.org/pdf/2410.10076)  
