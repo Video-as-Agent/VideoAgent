@@ -93,7 +93,7 @@ python train_mw.py --mode inference -c 1 -p ../examples/assembly.gif -t assembly
 
 We also provide checkpoints of the models described in our experiments as following.   
 ### Meta-World
-[VideoAgent](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-305.pt) |  [VideoAgent-Online](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-3053083.pt) | [VideoAgent-Suggestive](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-4307.pt)   
+[VideoAgent](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-305.pt) |  [VideoAgent-Online](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-3053083.pt) | [VideoAgent-Suggestive](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/metaworld/model-613.pt)   
 
 ### iThor
 [VideoAgent](https://huggingface.co/Trickyjustice/VideoAgent/resolve/main/ithor/thor-402.pt)
